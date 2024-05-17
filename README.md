@@ -1,2 +1,0 @@
-# ctdlgt
-ctdl-gt
