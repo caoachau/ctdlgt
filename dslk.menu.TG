@@ -1,0 +1,150 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <stdbool.h>
+
+typedef struct tamgiac {
+    int a, b, c;
+} TG;
+
+typedef struct node {
+    TG data;
+    struct node* next;
+} node;
+typedef node* pNode;
+pNode makenode(TG x) {
+    pNode t = (pNode)malloc(sizeof(node));
+    if (t != NULL) {
+        t->data = x;
+        t->next = NULL;
+    }
+    return t;
+}
+bool canh(int a, int b, int c) {
+    return ((a + b) > c) && ((a + c) > b) && ((b + c) > a);
+}
+void addLast(pNode* head, TG x) {
+    pNode t = makenode(x);
+    if (t == NULL) return;
+
+    if (*head == NULL) {
+        *head = t;
+    } else {
+        pNode p = *head;
+        while (p->next != NULL) {
+            p = p->next;
+        }
+        p->next = t;
+    }
+}
+
+float C(int a, int b, int c) {
+    return (a + b + c);
+}
+
+float S(int a, int b, int c) {
+    float p = (a + b + c) / 2.0;
+    return sqrt(p * (p - a) * (p - b) * (p - c));
+}
+
+void CV(pNode head) {
+    if (head == NULL) {
+        printf("Danh sach trong.\n");
+    } else {
+        pNode current = head;
+        int i = 1;
+        while (current != NULL) {
+            float CV = C(current->data.a, current->data.b, current->data.c);
+            printf("Tam giac %d: Chu vi: %.2f\n", i++, CV);
+            current = current->next;
+        }
+    }
+}
+
+void DT(pNode head) {
+    if (head == NULL) {
+        printf("Danh sach trong.\n");
+    } else {
+        pNode current = head;
+        int i = 1;
+        while (current != NULL) {
+            float DT = S(current->data.a, current->data.b, current->data.c);
+            printf("Tam giac %d: Dien tich: %.2f\n", i++, DT);
+            current = current->next;
+        }
+    }
+}
+
+void freenode(pNode* head) {
+    pNode current = *head;
+    pNode next;
+    while (current != NULL) {
+        next = current->next;
+        free(current);
+        current = next;
+    }
+    *head = NULL;
+}
+
+void insert(pNode* head) {
+    TG tamgiac;
+    printf("Nhap a, b, c: ");
+    scanf("%d %d %d", &tamgiac.a, &tamgiac.b, &tamgiac.c);
+    if (canh(tamgiac.a, tamgiac.b, tamgiac.c)) {
+        printf("Ba canh hop le\n");
+        addLast(head, tamgiac);
+    } else {
+        printf("Error! Nhap lai ba canh.\n");
+    }
+}
+
+void xuat(pNode head) {
+    if (head == NULL) {
+        printf("Danh sach trong.\n");
+    } else {
+        printf("||--------------------------------------------------------------||\n");
+        printf("||STT ||  a   ||  b   ||  c   ||  Chu vi      || Dien tich      ||\n");
+        pNode current = head;
+        int i = 1;
+        while (current != NULL) {
+            float CV = C(current->data.a, current->data.b, current->data.c);
+            float DT = S(current->data.a, current->data.b, current->data.c);
+            printf("||%3d || %3d  || %3d  || %3d  || %10.2f   ||   %10.2f       ||\n", i++, current->data.a, current->data.b, current->data.c, CV, DT);
+            current = current->next;
+        }
+        printf("||--------------------------------------------------------------||\n");
+    }
+}
+
+int main() {
+    pNode head = NULL;
+    int choice;
+    do {
+        printf("1. Them tam giac\n2. Xuat chu vi\n3. Xuat dien tich\n4. Xuat danh sach\n5. Thoat\n");
+        printf("Nhap lua chon: ");
+        scanf("%d", &choice);
+        switch (choice) {
+            case 1:
+                insert(&head);
+                break;
+            case 2:
+                CV(head);
+                break;
+            case 3:
+                DT(head);
+                break;
+            case 4:
+                xuat(head);
+                break;
+            case 5:
+                freenode(&head);
+                printf("Thoat chuong trinh.\n");
+                break;
+
+            default:
+                printf("Lua chon khong hop le.\n");
+        }
+    } while (choice != 5);
+
+    return 0;
+}

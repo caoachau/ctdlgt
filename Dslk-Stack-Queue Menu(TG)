@@ -1,0 +1,342 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <stdbool.h>
+
+typedef struct tamgiac {
+    int a, b, c;
+    float C,S;
+} TG;
+
+typedef struct node {
+    TG data;
+    struct node* next;
+} node;
+typedef node* pNode;
+
+pNode makenode(TG x) {
+    pNode t = (pNode)malloc(sizeof(node));
+    if (t != NULL) {
+        t->data = x;
+        t->next = NULL;
+    }
+    return t;
+}
+
+bool canh(int a, int b, int c) {
+    return ((a + b) > c) && ((a + c) > b) && ((b + c) > a);
+}
+
+
+
+float C(int a, int b, int c) {
+    return (a + b + c);
+}
+
+float S(int a, int b, int c) {
+    float p = (a + b + c) / 2.0;
+    return sqrt(p * (p - a) * (p - b) * (p - c));
+}
+
+
+void addLast(pNode* head, TG x) {
+    pNode t = makenode(x);
+    if (t == NULL) return;
+
+    if (*head == NULL) {
+        *head = t;
+    } else {
+        pNode p = *head;
+        while (p->next != NULL) {
+            p = p->next;
+        }
+        p->next = t;
+    }
+}
+
+void freenode(pNode* head) {
+    pNode current = *head;
+    pNode next;
+    while (current != NULL) {
+        next = current->next;
+        free(current);
+        current = next;
+    }
+    *head = NULL;
+}
+
+TG nhapABC() {
+    TG tamgiac;
+    do {
+        printf("Nhap a, b, c: ");
+        scanf("%d %d %d", &tamgiac.a, &tamgiac.b, &tamgiac.c);
+        if (!canh(tamgiac.a, tamgiac.b, tamgiac.c)) {
+            printf("Ba canh khong hop le. Vui long nhap lai.\n");
+        }
+    } while (!canh(tamgiac.a, tamgiac.b, tamgiac.c));
+    return tamgiac;
+}
+
+
+//===============Chuc nang DSLK=====================//
+// void insert(pNode* head) {
+//     TG tamgiac = nhapABC();
+//     addLast(head, tamgiac);
+//     printf("Da them tam giac vao DSLK.\n");
+// }
+
+// void xuat(pNode head) {
+//     if (head == NULL) {
+//         printf("Danh sach trong.\n");
+//     } else {
+//         printf("||--------------------------------------------------------------||\n");
+//         printf("||STT ||  a   ||  b   ||  c   ||  Chu vi      || Dien tich      ||\n");
+//         pNode current = head;
+//         int i = 1;
+//         while (current != NULL) {
+//             float CV = C(current->data.a, current->data.b, current->data.c);
+//             float DT = S(current->data.a, current->data.b, current->data.c);
+//             printf("||%3d || %3d  || %3d  || %3d  || %10.2f   ||   %10.2f       ||\n", i++, current->data.a, current->data.b, current->data.c, CV, DT);
+//             current = current->next;
+//         }
+//         printf("||--------------------------------------------------------------||\n");
+//     }
+// }
+// void CV(pNode head) {
+//     if (head == NULL) {
+//         printf("Danh sach trong.\n");
+//     } else {
+//         pNode current = head;
+//         int i = 1;
+//         while (current != NULL) {
+//             float CV = C(current->data.a, current->data.b, current->data.c);
+//             printf("Tam giac %d: Chu vi: %.2f\n", i++, CV);
+//             current = current->next;
+//         }
+//     }
+// }
+
+// void DT(pNode head) {
+//     if (head == NULL) {
+//         printf("Danh sach trong.\n");
+//     } else {
+//         pNode current = head;
+//         int i = 1;
+//         while (current != NULL) {
+//             float DT = S(current->data.a, current->data.b, current->data.c);
+//             printf("Tam giac %d: Dien tich: %.2f\n", i++, DT);
+//             current = current->next;
+//         }
+//     }
+// }
+
+//=================Chuc nang Stack=====================//
+
+void push(pNode* top, TG x) {
+    pNode t = makenode(x);
+    if (t == NULL) return;
+    t->next = *top;
+    *top = t;
+}
+
+TG pop(pNode* top) {
+    if (*top == NULL) {
+        printf("Stack rong.\n");
+        return (TG){0, 0, 0};
+    }
+    pNode temp = *top;
+    TG data = temp->data;
+    *top = (*top)->next;
+    free(temp);
+    return data;
+}
+
+TG peek(pNode top) {
+    if (top == NULL) {
+        printf("Stack rong.\n");
+        return (TG){0, 0, 0};
+    }
+    return top->data;
+}
+
+//==============Chuc nang Queue================//
+
+// void enqueue(pNode* front, pNode* rear, TG x) {
+//     pNode t = makenode(x);
+//     if (t == NULL) return;
+//     if (*rear == NULL) {
+//         *front = *rear = t;
+//         return;
+//     }
+//     (*rear)->next = t;
+//     *rear = t;
+// }
+
+// TG dequeue(pNode* front, pNode* rear) {
+//     if (*front == NULL) {
+//         printf("Queue rong.\n");
+//         return (TG){0, 0, 0};
+//     }
+//     pNode temp = *front;
+//     TG data = temp->data;
+//     *front = (*front)->next;
+//     if (*front == NULL) *rear = NULL;
+//     free(temp);
+//     return data;
+// }
+
+// void displayQueue(pNode front) {
+//     if (front == NULL) {
+//         printf("Queue rong.\n");
+//         return;
+//     }
+//     printf("Cac phan tu trong queue:\n");
+//     pNode current = front;
+//     int i = 1;
+//     while (current != NULL) {
+//         printf("%d. a=%d, b=%d, c=%d\n", i++, current->data.a, current->data.b, current->data.c);
+//         current = current->next;
+//     }
+// }
+//============================================//
+int main() {
+    pNode linkedList = NULL;
+    pNode stack = NULL;
+    pNode queueFront = NULL, queueRear = NULL;
+    int choice;
+    TG tamgiac = {0, 0, 0};  // Khởi tạo tam giác với giá trị mặc định
+
+    do {
+        printf("\nMenu chinh:\n");
+        printf("1. Nhap tam giac\n");
+        printf("2. Thao tac voi Danh sach lien ket\n");
+        printf("3. Thao tac voi Stack\n");
+        printf("4. Thao tac voi Queue\n");
+        printf("0. Thoat\n");
+        printf("Nhap lua chon: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                tamgiac = nhapABC();
+                printf("Da nhap: a = %d, b = %d, c = %d\n", tamgiac.a, tamgiac.b, tamgiac.c);
+                break;
+            // case 2:
+            // {
+            //     int llChoice;
+            //     do {
+            //         printf("\n--- Thao tac Danh sach lien ket ---\n");
+            //         printf("1. Them tam giac vao danh sach\n");
+            //         printf("2. Xuat thong tin tam giac\n");
+            //         printf("3. Tinh chu vi tam giac\n");
+            //         printf("4. Tinh dien tich tam giac\n");
+            //         printf("0. Quay lai menu chinh\n");
+            //         printf("Nhap lua chon: ");
+            //         scanf("%d", &llChoice);
+            //         switch (llChoice) {
+            //             case 1: 
+            //                 if (tamgiac.a != 0) {
+            //                     addLast(&linkedList, tamgiac);
+            //                     printf("Da them tam giac vao danh sach.\n");
+            //                 } else {
+            //                     printf("Vui long nhap tam giac truoc khi them vao danh sach.\n");
+            //                 }
+            //                 break;
+            //             case 2: xuat(linkedList); break;
+            //             case 3: CV(linkedList); break;
+            //             case 4: DT(linkedList); break;
+            //             case 0: printf("Quay lai menu chinh.\n"); break;
+            //             default: printf("Lua chon khong hop le.\n");
+            //         }
+            //     } while (llChoice != 0);
+            // }
+            // break;
+            case 3:
+            {
+                int stackChoice;
+                do {
+                    printf("\n--- Thao tac Stack ---\n");
+                    printf("1. PUSH (Them tam giac)\n");
+                    printf("2. POP (Lay tam giac)\n");
+                    printf("3. PEEK (Xem tam giac tren cung)\n");
+                    printf("0. Quay lai menu chinh\n");
+                    printf("Nhap lua chon: ");
+                    scanf("%d", &stackChoice);
+                    switch (stackChoice) {
+                        case 1:
+                            if (tamgiac.a != 0) {
+                                push(&stack, tamgiac);
+                                printf("Da them vao stack.\n");
+                            } else {
+                                printf("Vui long nhap tam giac truoc khi them vao stack.\n");
+                            }
+                            break;
+                        case 2:
+                            {
+                                TG popped = pop(&stack);
+                                if (popped.a != 0)
+                                    printf("Da lay ra: a=%d, b=%d, c=%d\n", popped.a, popped.b, popped.c);
+                            }
+                            break;
+                        case 3:
+                            {
+                                TG peeked = peek(stack);
+                                if (peeked.a != 0)
+                                    printf("Tam giac tren cung: a=%d, b=%d, c=%d\n", peeked.a, peeked.b, peeked.c);
+                            }
+                            break;
+                        case 0: printf("Quay lai menu chinh.\n"); break;
+                        default: printf("Lua chon khong hop le.\n");
+                    }
+                } while (stackChoice != 0);
+            }
+            break;
+            // case 4:
+            // {
+            //     int queueChoice;
+            //     do {
+            //         printf("\n--- Thao tac Queue ---\n");
+            //         printf("1. Enqueue (Them tam giac)\n");
+            //         printf("2. Dequeue (Lay tam giac)\n");
+            //         printf("3. Hien thi queue\n");
+            //         printf("0. Quay lai menu chinh\n");
+            //         printf("Nhap lua chon: ");
+            //         scanf("%d", &queueChoice);
+            //         switch (queueChoice) {
+            //             case 1:
+            //                 if (tamgiac.a != 0) {
+            //                     enqueue(&queueFront, &queueRear, tamgiac);
+            //                     printf("Da them vao queue.\n");
+            //                 } else {
+            //                     printf("Vui long nhap tam giac truoc khi them vao queue.\n");
+            //                 }
+            //                 break;
+            //             case 2:
+            //                 {
+            //                     TG dequeued = dequeue(&queueFront, &queueRear);
+            //                     if (dequeued.a != 0)
+            //                         printf("Da lay ra: a=%d, b=%d, c=%d\n", dequeued.a, dequeued.b, dequeued.c);
+            //                 }
+            //                 break;
+            //             case 3:
+            //                 displayQueue(queueFront);
+            //                 break;
+            //             case 0: printf("Quay lai menu chinh.\n"); break;
+            //             default: printf("Lua chon khong hop le.\n");
+            //         }
+            //     } while (queueChoice != 0);
+            // }
+            break;
+            case 0:
+                printf("Thoat chuong trinh.\n");
+                freenode(&linkedList);
+                freenode(&stack);
+                freenode(&queueFront);
+                break;
+            default:
+                printf("Lua chon khong hop le. Vui long thu lai.\n");
+        }
+    } while (choice != 0);
+    
+    return 0;
+}
